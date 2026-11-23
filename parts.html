@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parts</title>
+  <meta name="description" content="Every part for the drone build, batch by batch, with what's bought and what's still needed.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/site.js"></script>
+</head>
+<body data-page="parts">
+  <div id="site-header"></div>
+  <main id="main">
+    <header class="board page-head">
+      <div class="wrap">
+        <h1>Parts and shopping list</h1>
+        <p class="lede">Everything the build needs, in the order I'll buy it. Spreading it into batches keeps the cost manageable. Prices are approximate, checked in November 2026.</p>
+      </div>
+    </header>
+
+    <section class="section-tight">
+      <div class="wrap">
+        <div class="budget" id="budget"></div>
+        <div class="filters" id="filters" role="group" aria-label="Filter parts by status"></div>
+        <div id="batches"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap two-col">
+        <div>
+          <h2 style="font-size:var(--step-3)">Already have</h2>
+          <ul class="have-list" id="have"></ul>
+        </div>
+        <div class="callout">
+          <p><b>Want to help?</b> If you've got any of these lying around, especially LiPo batteries, a balance charger or spare FPV parts, let me know before I buy them.</p>
+          <p class="muted">Links marked Amazon are searches, so you can pick a listing that's in stock.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+</body>
+</html>

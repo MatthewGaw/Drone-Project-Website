@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gallery</title>
+  <meta name="description" content="Photos and drawings of the drone build.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/site.js"></script>
+</head>
+<body data-page="gallery">
+  <div id="site-header"></div>
+  <main id="main">
+    <header class="board page-head">
+      <div class="wrap">
+        <h1>Gallery</h1>
+        <p class="lede">Prints, boards, wiring and, eventually, flights. Click any picture to see it full size.</p>
+      </div>
+    </header>
+    <section class="section-tight">
+      <div class="wrap">
+        <div id="gallery-note"></div>
+        <div class="gallery" id="gallery"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Image viewer">
+    <div class="lb-stage"><img id="lb-img" alt=""></div>
+    <div class="lb-bar">
+      <p id="lb-cap"></p>
+      <div class="lb-btns">
+        <button type="button" id="lb-prev" aria-label="Previous image">Previous</button>
+        <button type="button" id="lb-next" aria-label="Next image">Next</button>
+        <button type="button" id="lb-close">Close</button>
+      </div>
+    </div>
+  </div>
+  <div id="site-footer"></div>
+</body>
+</html>

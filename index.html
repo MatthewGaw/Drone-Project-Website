@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home</title>
+  <meta name="description" content="Follow along as I build a quadcopter from scratch: printed frame, my own flight controller and my own code.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/site.js"></script>
+</head>
+<body data-page="home">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <section class="board hero">
+      <div class="wrap">
+        <div class="hero-grid">
+          <div>
+            <h1 id="hero-title"></h1>
+            <p class="lede" id="hero-lede"></p>
+            <div class="hero-actions">
+              <a class="btn btn-copper" href="roadmap.html">See the roadmap</a>
+              <a class="btn btn-ghost" href="parts.html">What I still need</a>
+            </div>
+          </div>
+          <div>
+            <div class="quad-stage" id="quad-stage"></div>
+            <p class="quad-hint">Tap the copper pads to see what each part does</p>
+          </div>
+        </div>
+        <dl class="readout" id="readout"></dl>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2 id="goal-head" style="max-width:20ch"></h2>
+        <p class="lede" style="margin-bottom:2rem">That's the target for the first version: up to the legal maximum height, built by hand from the frame to the firmware. These are the four parts of it.</p>
+        <div class="goal-list" id="goal-list"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap two-col">
+        <div>
+          <div class="sec-head"><h2>Right now</h2><a href="roadmap.html">All phases</a></div>
+          <div class="now-panel" id="now-panel"></div>
+        </div>
+        <div>
+          <div class="sec-head"><h2>Spec sheet</h2><a href="how-it-works.html">How it works</a></div>
+          <table class="spec"><tbody id="spec"></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="sec-head"><h2>Timeline</h2><a href="roadmap.html">Full roadmap</a></div>
+        <div id="home-gantt"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="sec-head"><h2>Latest updates</h2><a href="updates.html">All updates</a></div>
+        <div id="home-updates"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+</body>
+</html>

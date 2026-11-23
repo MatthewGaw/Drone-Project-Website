@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How it works</title>
+  <meta name="description" content="How the drone stays level: the flight controller, sensors, radio, software and failsafes.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/site.js"></script>
+</head>
+<body data-page="how">
+  <div id="site-header"></div>
+  <main id="main">
+    <header class="board page-head">
+      <div class="wrap">
+        <h1>How it works</h1>
+        <p class="lede">A quadcopter can't fly on its own. It's balanced on four spinning motors and would flip in a fraction of a second without a computer correcting it constantly. This page explains how mine does that.</p>
+        <nav class="toc" aria-label="On this page">
+          <a href="#overview">The big picture</a><a href="#loop">Staying level</a><a href="#software">The software</a><a href="#modes">Flight modes</a><a href="#failsafes">Failsafes</a><a href="#pcb">The circuit board</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="section" id="overview">
+      <div class="wrap">
+        <h2>The big picture</h2>
+        <p class="lede" style="margin-bottom:2rem">One board I design flies the drone. The laptop sends commands and watches, but never flies it directly: if the laptop crashes, the drone still keeps itself level.</p>
+        <div class="diagram-wrap" id="arch"></div>
+      </div>
+    </section>
+
+    <section class="section" id="loop">
+      <div class="wrap two-col">
+        <div>
+          <h2>Staying level, 1,000 times a second</h2>
+          <p>Every millisecond, the flight controller runs the same loop. It reads the motion sensor, works out which way the drone is tilted, compares that with where it should be, and nudges the four motor speeds to correct it.</p>
+          <p>The corrections come from a <b>PID controller</b>: the size of the error, how long it's lasted, and how fast it's changing. Tuning those three numbers is most of the work between "spins its motors" and "hovers smoothly", which is why there's a whole phase on a test rig for it.</p>
+          <p>The RP2350 chip has two cores. Core 0 does nothing but this loop, so it never misses a beat. Core 1 handles everything else: the radio, saving logs to the SD card, checking the battery and watching for problems.</p>
+        </div>
+        <div>
+          <h3 style="font-size:var(--step-1);margin-top:.6rem">The loop on core 0</h3>
+          <ol class="loop" aria-label="Control loop steps, in order">
+            <li>Read IMU</li><li>Estimate angle</li><li>Angle PID</li><li>Rate PID</li><li>Motor mixer</li><li>PWM out</li>
+          </ol>
+          <div class="callout">
+            <p><b>Why 1 kHz?</b> The faster the loop, the smaller each correction and the smoother the flight. MicroPython can't hold that timing reliably, so the flight loop is written in C++. Everything gets prototyped in MicroPython first.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="software">
+      <div class="wrap">
+        <h2>The software: three programs</h2>
+        <div class="goal-list" style="margin-top:1.5rem">
+          <div><h3>Flight firmware</h3><p>C++ with the Pico SDK, on the drone. The control loop, arming, failsafes, logging and the mission runner. A hardware watchdog stops the motors if the loop ever freezes.</p></div>
+          <div><h3>Radio bridge</h3><p>On a second Pico plugged into the laptop. It passes commands up to the drone and telemetry back down over the nRF24 radio.</p></div>
+          <div><h3>Ground station</h3><p>Python on my Mac (PySide6 and pyqtgraph). An artificial horizon, height, battery, motor outputs, link quality and a big kill button. Controlled with a gamepad.</p></div>
+          <div><h3>Logs</h3><p>Every loop is saved to the SD card: about 64 kB a second. After each flight I graph the gyro noise and PID terms before changing anything.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="modes">
+      <div class="wrap">
+        <h2>Flight modes</h2>
+        <div class="table-scroll">
+          <table class="data-table" style="margin-top:1rem">
+            <thead><tr><th>Mode</th><th>Who's in control</th><th>How it starts</th></tr></thead>
+            <tbody>
+              <tr><td>Disarmed</td><td>Nobody; motors stopped</td><td>Power-up, the kill button, or landing detected</td></tr>
+              <tr><td>Laptop (self-levelling)</td><td>Me: the sticks set the tilt angle and climb rate</td><td>Arm on the gamepad with a healthy radio link</td></tr>
+              <tr><td>Mission</td><td>A script on the drone</td><td>Upload and start from the ground station; touching the sticks or kill button takes over</td></tr>
+              <tr><td>Failsafe land</td><td>A script on the drone</td><td>Any of the failsafes below</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="muted" style="margin-top:1rem">Arming needs four things at once: the arm switch, throttle low, the drone level, and a healthy link.</p>
+      </div>
+    </section>
+
+    <section class="section" id="failsafes">
+      <div class="wrap">
+        <h2>Failsafes</h2>
+        <p class="lede">What the drone does on its own when something goes wrong.</p>
+        <div class="table-scroll">
+          <table class="data-table" style="margin-top:1rem">
+            <thead><tr><th>If this happens</th><th>The drone does this</th></tr></thead>
+            <tbody>
+              <tr><td>No radio packet for 0.5 seconds</td><td>Holds level, hovers for 2 seconds, then descends at 0.5 m/s and lands. Hands control back if the link returns first.</td></tr>
+              <tr><td>Battery under 3.5 V per cell</td><td>Warns on the ground station. Under 3.3 V per cell it lands itself.</td></tr>
+              <tr><td>Above the height ceiling</td><td>Stops climbing and comes back down below it. The ceiling starts at 30 m and is never above 115 m.</td></tr>
+              <tr><td>Tilted past 60°, or the sensor stops responding</td><td>Cuts the motors. It's either crashing or flying blind.</td></tr>
+              <tr><td>Kill button pressed</td><td>Cuts the motors immediately, in any mode.</td></tr>
+              <tr><td>The control loop freezes</td><td>The watchdog resets the chip and the motors stop.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:1.5rem">For landing, a barometer gives height to about half a metre. Below 3 m a small laser rangefinder pointing down takes over, and the drone disarms once it reads under 5 cm and has stopped moving.</p>
+      </div>
+    </section>
+
+    <section class="section" id="pcb">
+      <div class="wrap">
+        <div class="two-col">
+          <div>
+            <h2>The circuit board</h2>
+            <p>The first version (Rev A) is a carrier board: I design the board, and a Pico 2 module solders onto it. That keeps the fiddliest part of the chip's support circuit off my first ever PCB, while still making it a complete flight controller of my own.</p>
+            <p>It's a 4-layer board with a solid ground plane. The noisy power parts sit at one edge, and the motion sensor sits in the middle. JLCPCB solders the tiny sensor chips, and I hand-solder the rest. It also has ports ready for GPS, a compass and a camera later, so adding them won't need a new design.</p>
+          </div>
+          <img src="assets/img/pcb-rev-a.svg" alt="Drawing of the Rev A flight controller board layout" style="border-radius:6px">
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" style="margin-top:2rem">
+            <thead><tr><th>Block</th><th>Part</th><th>What it's for</th></tr></thead>
+            <tbody>
+              <tr><td>Battery input</td><td><span class="mono">XT60, TVS diode, P-FET</span></td><td>Survives the battery being plugged in backwards, and voltage spikes</td></tr>
+              <tr><td>5 V supply</td><td><span class="mono">TPS54302 / MP2315</span></td><td>3 A for the Pico, radio and future GPS and camera</td></tr>
+              <tr><td>3.3 V sensor supply</td><td><span class="mono">ME6211 / AP2112</span></td><td>A separate, clean supply so the motion sensor isn't noisy</td></tr>
+              <tr><td>Brain</td><td><span class="mono">Raspberry Pi Pico 2</span></td><td>Programmed over its own USB port</td></tr>
+              <tr><td>Motion sensor</td><td><span class="mono">BMI270 / LSM6DSO</span></td><td>Gyro and accelerometer on its own SPI bus</td></tr>
+              <tr><td>Barometer</td><td><span class="mono">BMP390 / DPS310</span></td><td>Height from air pressure, under foam to block prop wash</td></tr>
+              <tr><td>Downward range</td><td><span class="mono">VL53L1X</span></td><td>Accurate height for the last few metres of landing</td></tr>
+              <tr><td>microSD</td><td>Push-push socket</td><td>Flight logs, on a separate bus so logging never delays the sensor</td></tr>
+              <tr><td>Radio</td><td><span class="mono">nRF24L01+</span></td><td>Plus pads for an ELRS receiver upgrade</td></tr>
+              <tr><td>Feedback</td><td>Buzzer and RGB LED</td><td>Status at a glance, and an alarm to find it in long grass</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+</body>
+</html>

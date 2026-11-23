@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Presenting</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="stylesheet" href="assets/css/present.css">
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/site.js"></script>
+  <script src="assets/js/present.js"></script>
+</head>
+<body data-page="present" class="deck-body">
+  <main class="deck" id="deck" aria-roledescription="slide deck" aria-live="polite"></main>
+
+  <div class="deck-bar" id="deck-bar">
+    <button class="present-toggle" id="exit" type="button" aria-pressed="true" title="Leave presenting mode (Esc)"><span class="switch" aria-hidden="true"></span>Presenting</button>
+    <div class="deck-progress" aria-hidden="true"><span id="progress"></span></div>
+    <span class="deck-count" id="count"></span>
+    <div class="deck-btns">
+      <button type="button" id="prev" aria-label="Previous slide">Back</button>
+      <button type="button" id="next" aria-label="Next slide">Next</button>
+      <button type="button" id="fs" aria-label="Full screen (F)">Full screen</button>
+    </div>
+  </div>
+</body>
+</html>
